@@ -22,10 +22,10 @@ import io.jsonwebtoken.security.Keys;
  */
 @Service
 public class JwtService {
-        @Value("${security.jwt.secret-key}")
+    @Value("${security.jwt.secret-key}")
     private String secretKey;
 
-    @Value("${security.expiration-time}")
+    @Value("${security.jwt.expiration-time}")
     private long jwtExpiration;
 
     public String extractUsername(String token) {
@@ -60,7 +60,7 @@ public class JwtService {
                 .compact();
     }
 
-    private boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
