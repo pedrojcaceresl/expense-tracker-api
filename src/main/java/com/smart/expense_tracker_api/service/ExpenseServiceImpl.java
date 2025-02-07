@@ -24,7 +24,6 @@ public class ExpenseServiceImpl implements ExpenseService {
         Expense expense = new Expense();
         expense.setName("Cinema Hobby");
         expense.setDescription("Good times");
-        expense.setAmount(25.4);
 
         List<Expense> expenses = new ArrayList<Expense>();
         expenses.add(expense);
