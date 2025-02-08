@@ -40,6 +40,6 @@ public class Expense {
     private String paymentMethod;
 
     @ManyToOne(cascade =  CascadeType.ALL) // Ensures dependent expenses are deleted
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 }
