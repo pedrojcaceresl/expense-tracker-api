@@ -27,14 +27,19 @@ public class AuthenticationService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+    }
+
     public User signup(RegisterUserDTO input) {
         User user = User.builder()
                 .email(input.getEmail())
                 .fullName(input.getFullname())
                 .password(passwordEncoder.encode(input.getPassword()))
                 .build();
-        userRepository.save(user);
-        return user;
+        return userRepository.save(user);
     }
 
     public User authenticate(LoginUserDTO input) {
