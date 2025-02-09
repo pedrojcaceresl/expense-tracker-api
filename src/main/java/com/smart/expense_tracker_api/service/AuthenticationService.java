@@ -3,6 +3,7 @@ package com.smart.expense_tracker_api.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,17 +38,20 @@ public class AuthenticationService {
         User user = User.builder()
                 .email(input.getEmail())
                 .fullName(input.getFullname())
+                .username(input.getUsername())
                 .password(passwordEncoder.encode(input.getPassword()))
                 .build();
         return userRepository.save(user);
     }
 
     public User authenticate(LoginUserDTO input) {
+        User user = userRepository.findByEmailOrUsername(input.getIdentifier())
+                .orElseThrow(() -> new UsernameNotFoundException("❌ Usuario no encontrado"));
+
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword())
+            new UsernamePasswordAuthenticationToken(user.getEmail(), input.getPassword())
         );
 
-        return userRepository.findByEmail(input.getEmail())
-                .orElseThrow();
+        return user;
     }
 }
