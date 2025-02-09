@@ -1,11 +1,12 @@
 package com.smart.expense_tracker_api.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.smart.expense_tracker_api.model.Expense;
+import com.smart.expense_tracker_api.repository.ExpenseRepository;
 
 /**
  *
@@ -14,21 +15,21 @@ import com.smart.expense_tracker_api.model.Expense;
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
 
+    @Autowired
+    private ExpenseRepository expenseRepository;
+
     @Override
     public Expense saveExpense(Expense expense) {
-        throw new UnsupportedOperationException("Unimplemented method 'saveExpense'");
+        if (expense.getUser() == null || expense.getUser().getId() == null) {
+            throw new RuntimeException("El usuario no puede ser nulo y debe tener un ID válido");
+        }
+
+        return expenseRepository.save(expense);
     }
 
     @Override
     public List<Expense> getExpensesList() {
-        Expense expense = new Expense();
-        expense.setName("Cinema Hobby");
-        expense.setDescription("Good times");
-
-        List<Expense> expenses = new ArrayList<Expense>();
-        expenses.add(expense);
-
-        return expenses;
+        return expenseRepository.findAll();
     }
 
     @Override
