@@ -1,7 +1,10 @@
 package com.smart.expense_tracker_api.controller;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +17,7 @@ import com.smart.expense_tracker_api.service.JwtService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import org.slf4j.Logger;
 
 /**
  *
@@ -24,15 +28,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class AuthenticationController {
     
     @Autowired
-    private final JwtService jwtService;
+    private JwtService jwtService;
 
     @Autowired
-    private final AuthenticationService authenticationService;
+    private AuthenticationService authenticationService;
 
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService) {
-        this.jwtService = jwtService;
-        this.authenticationService = authenticationService;
-    }
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     @PostMapping("/signup")
     public ResponseEntity<User> register(@RequestBody RegisterUserDTO registerUserDTO) {
@@ -42,17 +44,32 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDTO loginUserDTO) {
-        User authenticateduser = authenticationService.authenticate(loginUserDTO);
+    public ResponseEntity<?> authenticate(@RequestBody LoginUserDTO loginUserDTO) {
+        try {
+            User authenticatedUser = authenticationService.authenticate(loginUserDTO);
         
-        String jwtToken = jwtService.generateToken(authenticateduser);
+            String jwtToken = jwtService.generateToken(authenticatedUser);
 
-        LoginResponse loginResponse = LoginResponse.builder()
-                                            .token(jwtToken)
-                                            .expiresIn(jwtService.getExpirationTime())
-                                            .build();
-        return ResponseEntity.ok(loginResponse);
+            LoginResponse loginResponse = LoginResponse.builder()
+                    .token(jwtToken)
+                    .expiresIn(jwtService.getExpirationTime())
+                    .build();
+
+            return ResponseEntity.ok(loginResponse);
+
+        } catch (UsernameNotFoundException e) {
+            logger.error("❌ Usuario no encontrado: {}", e.getMessage());
+            return ResponseEntity.status(404).body("Usuario no encontrado");
+
+        } catch (BadCredentialsException e) {
+            logger.error("❌ Credenciales incorrectas: {}", e.getMessage());
+            return ResponseEntity.status(401).body("Credenciales incorrectas");
+
+        } catch (Exception e) {
+            logger.error("❌ Error interno en autenticación: ", e);
+            return ResponseEntity.internalServerError()
+                    .body("Error interno del servidor. Intente nuevamente más tarde.");
+        }
     }
-    
     
 }
