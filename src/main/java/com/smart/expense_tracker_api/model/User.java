@@ -43,6 +43,7 @@ public class User implements UserDetails {
 
     @Column(unique = true, nullable = false)
     private String email;
+    @Column(unique = true)
     private String username;
     private String password;
     
@@ -65,7 +66,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(() -> "ROLE_" + role.name());
     }
 
     @Override
@@ -87,6 +88,12 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    @Override
+    public String getUsername() {  
+        return username != null ? username : email;
+    }
+
 
 
 }
