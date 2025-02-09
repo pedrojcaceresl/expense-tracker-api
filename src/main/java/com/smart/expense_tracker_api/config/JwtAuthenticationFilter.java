@@ -3,6 +3,8 @@ package com.smart.expense_tracker_api.config;
 import java.io.IOException;
 
 import org.springframework.stereotype.Component;
+
+import com.smart.expense_tracker_api.service.CustomUserDetailsService;
 import com.smart.expense_tracker_api.service.JwtService;
 
 
@@ -15,7 +17,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -27,15 +28,14 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver;
-
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
     private final int BEGIN_INDEX = 7;
 
     public JwtAuthenticationFilter(
         JwtService jwtService,
-        UserDetailsService userDetailsService,
+        CustomUserDetailsService userDetailsService,
         HandlerExceptionResolver handlerExceptionResolver
     ) {
         this.jwtService = jwtService;
@@ -77,7 +77,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (Exception exception) {
             handlerExceptionResolver.resolveException(request, response, null, exception);
+                throw exception;
         }
-
     }
 }
