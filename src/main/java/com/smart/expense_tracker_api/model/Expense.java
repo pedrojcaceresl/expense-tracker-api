@@ -35,12 +35,11 @@ public class Expense {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long expenseId;
+    private Long id;
 
     @NotNull
     @Size(min = 3, max = 100)
     private String name;
-    private String category;
 
     @NotNull
     @DecimalMin("0.0")
@@ -49,7 +48,11 @@ public class Expense {
     private String description;
     private String paymentMethod;
 
-    @ManyToOne(cascade =  CascadeType.ALL) // Ensures dependent expenses are deleted
+    @ManyToOne()
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 }
