@@ -3,10 +3,12 @@ package com.smart.expense_tracker_api.service;
 import com.smart.expense_tracker_api.model.User;
 import com.smart.expense_tracker_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
